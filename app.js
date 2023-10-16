@@ -1,91 +1,41 @@
-// const express=require("express");
-// const app=express();
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var logger = require('morgan');
 
-// app.get('/',(req,res)=>{
-//       res.send("Welcome to Shoaib Akther");
-// })
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
 
-// app.listen(3000,()=>{
-//       console.log("Listening this file");
-// })
+var app = express();
 
-// // Get and Post Method
-// app.get('/getRequest',(req,res)=>{
-//       res.send("Hello this is successfull Get Request")
-// })
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
 
-// app.post('/postRequest',(req,res)=>{
-//       res.send('Hello this is successfull Post Request');
-// })
-
-
-// MiddleWere
-
-// const express=require("express");
-// const app=express();
-// const reqFilter=(reqObject,resObject,next)=>{
-//       console.log('reqFilter');
-//       next();
-// }
-// app.use(reqFilter)
-
-// app.get('/',(req,res)=>{
-//       res.send("Welcome to Shoaib Akther");
-// })
-// app.get('/home',(req,res)=>{
-//       res.send("Welcome to Shoaib Akther in Home page");
-// })
-
-// app.listen(3000,()=>{
-//       console.log("Listening this file");
-// })
-
-
-
-// Error Handling
-
-// const express=require('express');
-// const morgan=require('morgan');
-// const createError=require('http-errors');
-// require(`dotenv`).config
-
-
-// const app=express()
-// const PORT=process.env.PROT||3000
-
-// app.listen(PORT,()=>{
-//       console.log(`Server is runnnig on port ${PORT}`)
-// })
-
-
-// const app=require('express')()
-// const PORT=3000;
-
-// app.listen(PORT,()=>{
-//       console.log(`Its running on  http://localhost:${PORT}`)
-// })
-
-
-
-// User Registration Project
-
-const express=require('express');
-const port=process.env.PORT || 3000
-
-const app=express();
-
+app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded());
-app.use(express.static('public'));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
 
-app.get('/form',(req,res)=>{
-      res.sendFile(__dirname+'/public/index.html')
-})
-app.post('/formPost',(req,res)=>{
-      console.log(req.body)
-})
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  next(createError(404));
+});
 
-app.listen(port,()=>{
-      console.log(`Server started at http://localhost:${port}`)
-})
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+module.exports = app;
